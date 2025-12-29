@@ -22,25 +22,58 @@ db.connect((err) => {
 });
 
 // REGISTER //
+// app.post("/register", async (req, res) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password)
+//     return res.status(400).json({ message: "Email & Password required" });
+
+//   const hashed = await bcrypt.hash(password, 10);
+
+//   const sql = "INSERT INTO users (email, password) VALUES (?, ?)";
+
+//   db.query(sql, [email, hashed], (err, _result) => {
+//     if (err) {
+//       console.log(err);
+//       return res.status(500).json({ message: "DB Error" });
+//     }
+//     res.json({ message: "User registered successfully" });
+//   });
+// });
+
+// REGISTER //
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password)
-    return res.status(400).json({ message: "Email & Password required" });
-
-  const hashed = await bcrypt.hash(password, 10);
-
-  const sql = "INSERT INTO users (email, password) VALUES (?, ?)";
-
-  db.query(sql, [email, hashed], (err, _result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ message: "DB Error" });
-    }
-    res.json({ message: "User registered successfully" });
+    const { email, password } = req.body;
+  
+    if (!email || !password)
+      return res.status(400).json({ message: "Email & Password required" });
+  
+    const checkSql = "SELECT email FROM users WHERE email = ?";
+  
+    db.query(checkSql, [email], async (err, results) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json({ message: "DB Error" });
+      }
+  
+      if (results.length > 0) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+  
+      const hashed = await bcrypt.hash(password, 10);
+      const insertSql = "INSERT INTO users (email, password) VALUES (?, ?)";
+  
+      db.query(insertSql, [email, hashed], (err2, _result) => {
+        if (err2) {
+          console.log(err2);
+          return res.status(500).json({ message: "Insert failed" });
+        }
+  
+        return res.status(201).json({ message: "User registered successfully" });
+      });
+    });
   });
-});
-
+  
 // Login //
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
@@ -54,7 +87,7 @@ app.post("/login", (req, res) => {
     db.query(sql, [email], async (err, results) => {
       if (err) {
         console.log(err);
-        return res.status(500).json({ message: "DB Error" });
+        return res.status(500).json({ message: "User Already exists" });
       }
       const rows = results as any[];
   
