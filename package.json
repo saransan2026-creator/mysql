@@ -1,0 +1,28 @@
+{
+  "name": "mysql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saransan2026-creator/mysql.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/saransan2026-creator/mysql/issues"
+  },
+  "homepage": "https://github.com/saransan2026-creator/mysql#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.16.0"
+  }
+}
