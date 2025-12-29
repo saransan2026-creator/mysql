@@ -21,25 +21,6 @@ db.connect((err) => {
   }
 });
 
-// REGISTER //
-// app.post("/register", async (req, res) => {
-//   const { email, password } = req.body;
-
-//   if (!email || !password)
-//     return res.status(400).json({ message: "Email & Password required" });
-
-//   const hashed = await bcrypt.hash(password, 10);
-
-//   const sql = "INSERT INTO users (email, password) VALUES (?, ?)";
-
-//   db.query(sql, [email, hashed], (err, _result) => {
-//     if (err) {
-//       console.log(err);
-//       return res.status(500).json({ message: "DB Error" });
-//     }
-//     res.json({ message: "User registered successfully" });
-//   });
-// });
 
 // REGISTER //
 app.post("/register", async (req, res) => {
