@@ -1,98 +1,102 @@
 import express from "express";
 import mysql from "mysql";
 import bcrypt from "bcryptjs";
+import router from "./Routes/Authroutes.ts";
 
 const app = express();
 app.use(express.json());
 
-// MySQL Connection //
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",       
-  database: "userdb"
-});
+app.use("/api", router);
 
-db.connect((err) => {
-  if (err) {
-    console.log("DB connection failed:", err);
-  } else {
-    console.log("MySQL Connected");
-  }
-});
+app.get("/", (_req, res) => res.send("API Running..."));
+
+
+
+// // MySQL Connection //
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "",       
+//   database: "userdb"
+// });
+
+// db.connect((err) => {
+//   if (err) {
+//     console.log("DB connection failed:", err);
+//   } else {
+//     console.log("MySQL Connected");
+//   }
+// });
 
 
 // REGISTER //
-app.post("/register", async (req, res) => {
-    const { email, password } = req.body;
+// app.post("/register", async (req, res) => {
+//     const { email, password } = req.body;
   
-    if (!email || !password)
-      return res.status(400).json({ message: "Email & Password required" });
+//     if (!email || !password)
+//       return res.status(400).json({ message: "Email & Password required" });
   
-    const checkSql = "SELECT email FROM users WHERE email = ?";
+//     const checkSql = "SELECT email FROM users WHERE email = ?";
   
-    db.query(checkSql, [email], async (err, results) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "DB Error" });
-      }
+//     db.query(checkSql, [email], async (err, results) => {
+//       if (err) {
+//         console.log(err);
+//         return res.status(500).json({ message: "DB Error" });
+//       }
   
-      if (results.length > 0) {
-        return res.status(409).json({ message: "Email already registered" });
-      }
+//       if (results.length > 0) {
+//         return res.status(409).json({ message: "Email already registered" });
+//       }
   
-      const hashed = await bcrypt.hash(password, 10);
-      const insertSql = "INSERT INTO users (email, password) VALUES (?, ?)";
+//       const hashed = await bcrypt.hash(password, 10);
+//       const insertSql = "INSERT INTO users (email, password) VALUES (?, ?)";
   
-      db.query(insertSql, [email, hashed], (err2, _result) => {
-        if (err2) {
-          console.log(err2);
-          return res.status(500).json({ message: "Insert failed" });
-        }
+//       db.query(insertSql, [email, hashed], (err2, _result) => {
+//         if (err2) {
+//           console.log(err2);
+//           return res.status(500).json({ message: "Insert failed" });
+//         }
   
-        return res.status(200).json({ message: "User registered Successfully" });
-      });
-    });
-  });
+//         return res.status(200).json({ message: "User registered Successfully" });
+//       });
+//     });
+//   });
   
-// Login //
-app.post("/login", (req, res) => {
-    const { email, password } = req.body;
+// // Login //
+// app.post("/login", (req, res) => {
+//     const { email, password } = req.body;
   
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email & Password required" });
-    }
+//     if (!email || !password) {
+//       return res.status(400).json({ message: "Email & Password required" });
+//     }
   
-    const sql = "SELECT * FROM users WHERE email = ?";
+//     const sql = "SELECT * FROM users WHERE email = ?";
   
-    db.query(sql, [email], async (err, results) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({ message: "User Already exists" });
-      }
-      const rows = results as any[];
+//     db.query(sql, [email], async (err, results) => {
+//       if (err) {
+//         console.log(err);
+//         return res.status(500).json({ message: "User Already exists" });
+//       }
+//       const rows = results as any[];
   
-      if (!rows || rows.length === 0) {
-        return res.status(404).json({ message: "User not found" });
-      }
+//       if (!rows || rows.length === 0) {
+//         return res.status(404).json({ message: "User not found" });
+//       }
   
-      const user = rows[0];
-      const isMatch = await bcrypt.compare(password, user.password);
+//       const user = rows[0];
+//       const isMatch = await bcrypt.compare(password, user.password);
   
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+//       if (!isMatch) {
+//         return res.status(401).json({ message: "Invalid credentials" });
+//       }
   
-      return res.json({
-        message: "Login successful",
-        userId: user.id,
-        email: user.email
-      });
-    });
-  });
+//       return res.json({
+//         message: "Login successful",
+//         userId: user.id,
+//         email: user.email
+//       });
+//     });
+//   });
   
-app.get("/", (_req, res) => {
-    res.send("API running...");
-  });
   
   app.listen(5000, () => console.log("Server running on port 5000"));
