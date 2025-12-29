@@ -1,5 +1,5 @@
 import express from "express";
-import mysql from "mysql2";
+import mysql from "mysql";
 import bcrypt from "bcryptjs";
 
 const app = express();
@@ -50,7 +50,7 @@ app.post("/register", async (req, res) => {
           return res.status(500).json({ message: "Insert failed" });
         }
   
-        return res.status(201).json({ message: "User registered successfully" });
+        return res.status(200).json({ message: "User registered Successfully" });
       });
     });
   });
