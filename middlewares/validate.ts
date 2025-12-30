@@ -9,13 +9,9 @@ export const validateAuth = (
 ) => {
   const { email, password } = req.body;
 
-  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-  // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
-
   if (!email || !password) {
     return res.status(400).json({
-        message: Messages.REQUIRED_FIELDS,
+      message: Messages.REQUIRED_FIELDS,
     });
   }
 
@@ -28,7 +24,7 @@ export const validateAuth = (
   if (!Regex.PASSWORD.test(password)) {
     return res.status(400).json({
       message: Messages.INVALID_PASSWORD,
-        
+
     });
   }
 
