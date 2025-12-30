@@ -8,5 +8,10 @@ export const Messages = {
     USER_NOT_FOUND: "User not found",
     INVALID_CREDENTIALS: "Invalid credentials",
     LOGIN_SUCCESS: "Login successful",
+    
+    INVALID_EMAIL: "Please enter a valid email address",
+    INVALID_PASSWORD:"Password must be at least 6 characters, include letters and numbers",
+
+   
   };
   
