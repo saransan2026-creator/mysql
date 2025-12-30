@@ -1,33 +1,4 @@
-// import express from "express";
-// // import { Request, Response, NextFunction } from "express";
-// import { Request, Response, NextFunction } from "express";
-
-
-// export const validateAuth = (req: Request, res: Response, next: NextFunction) => {
-//   const { email, password } = req.body;
-
-//   if (!email || !password) {
-//     return res.status(400).json({ message: "Email and Password are required" });
-//   }
-
-//   if (!email.includes("@","com","net","org")) {
-//     return res.status(400).json({ message: "Please enter a valid email" });
-//   }
-
-//   if (password.length < 6) {
-//     return res.status(400).json({
-//       message: "Password must be at least 6 characters long",
-//     });
-//   }
-
-//   next();
-// };
-
-
-import express from "express";
-
-const { Request, Response, NextFunction } = express;
-
+import express, { type Request, type Response, type NextFunction } from "express";
 export const validateAuth = (
   req: typeof Request,
   res: typeof Response,
@@ -35,21 +6,26 @@ export const validateAuth = (
 ) => {
   const { email, password } = req.body;
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+
   if (!email || !password) {
     return res.status(400).json({
-      message: "Email and Password are required",
+      message: "Email and password are required",
     });
   }
 
-  if (!email.includes("@", "com", "net", "org","in")) {
+  if (!emailRegex.test(email)) {
     return res.status(400).json({
-      message: "Please enter a valid email",
+      message: "Please enter a valid email address",
     });
   }
 
-  if (password.length < 6) {
+  if (!passwordRegex.test(password)) {
     return res.status(400).json({
-      message: "Password must be at least 6 characters long",
+      message:
+        "Password must be at least 6 characters, include letters and numbers",
     });
   }
 
