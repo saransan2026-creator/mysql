@@ -1,5 +1,7 @@
 import express, { type Request, type Response, type NextFunction } from "express";
 import { Messages } from "../utils/messages.ts";
+import { Regex } from "../utils/regex.ts";
+
 export const validateAuth = (
   req: typeof Request,
   res: typeof Response,
@@ -7,9 +9,9 @@ export const validateAuth = (
 ) => {
   const { email, password } = req.body;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+  // const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -17,13 +19,13 @@ export const validateAuth = (
     });
   }
 
-  if (!emailRegex.test(email)) {
+  if (!Regex.EMAIL.test(email)) {
     return res.status(400).json({
       message: Messages.INVALID_EMAIL,
     });
   }
 
-  if (!passwordRegex.test(password)) {
+  if (!Regex.PASSWORD.test(password)) {
     return res.status(400).json({
       message: Messages.INVALID_PASSWORD,
         
