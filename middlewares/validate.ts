@@ -1,11 +1,11 @@
 import express, { type Request, type Response, type NextFunction } from "express";
-import { Messages } from "../utils/messages.ts";
-import { Regex } from "../utils/regex.ts";
+import { Messages } from "../utils/messages";
+import { Regex } from "../utils/regex";
 
 export const validateAuth = (
-  req: typeof Request,
-  res: typeof Response,
-  next: typeof NextFunction
+  req:  Request,
+  res:  Response,
+  next: NextFunction
 ) => {
   const { email, password } = req.body;
 

@@ -1,7 +1,7 @@
 import express from "express";
 import mysql from "mysql";
 import bcrypt from "bcryptjs";
-import router from "./Routes/Authroutes.ts";
+import router from "./Routes/Authroutes";
 
 const app = express();
 app.use(express.json());

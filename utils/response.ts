@@ -1,5 +1,7 @@
-export const sendSuccess = (res: any, message: string, data: any = {}) => {
-    return res.status(200).json({
+import { StatusCode } from "./statuscode";
+
+export const sendSuccess = (res: any, message: string, p0: { email: any }) => {
+    return res.status(StatusCode.SUCCESS).json({
         success: true,
         message,
     });
