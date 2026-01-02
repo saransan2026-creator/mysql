@@ -7,11 +7,6 @@ import { Queries } from "../services/auth.Service";
 import { StatusCode } from "../utils/statuscode";
 import prisma from "../config/prisma";
 
-// import { Request, Response } from "express";
-// import prisma from "../config/prisma";
-// import bcrypt from "bcrypt";
-// import { sendError, sendSuccess } from "../utils/response";
-// import { StatusCode, Messages } from "../constants";
 
 export default class Authcontrol {
 
@@ -64,7 +59,6 @@ export default class Authcontrol {
       if (!email || !password)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-      // Find user
       const user = await prisma.user.findUnique({
         where: { email },
         include: { profile: true }
