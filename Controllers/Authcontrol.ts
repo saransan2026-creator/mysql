@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { db } from "../config/db";
 import { sendSuccess, sendError } from "../utils/response";
 import { Messages } from "../utils/messages";
-import { Queries } from "../services/auth.Service";
 import { StatusCode } from "../utils/statuscode";
 import prisma from "../config/prisma";
+import { profile } from "console";
 
 
 export default class Authcontrol {
@@ -41,10 +40,12 @@ export default class Authcontrol {
       });
 
       return sendSuccess(res, Messages.REGISTER_SUCCESS, {
-        id: user.id,
-        email: user.email,
-        profile: user.profile
-      });
+        // id: user.id,
+        // email: user.email,
+        // profile: user.profile
+        
+      }
+      ,user);
 
     } catch (err) {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
@@ -74,15 +75,58 @@ export default class Authcontrol {
       return sendSuccess(res, Messages.LOGIN_SUCCESS, {
         id: user.id,
         email: user.email,
-        profile: user.profile
-      });
-
+        profile: user.profile,
+      },
+      user
+    );
     } catch (err) {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
     }
   }
+
+ // UPDATE PROFILE 
+ static async updateProfile(req: Request, res: Response) {
+  try {
+    const  userId  = req.query.userId as string;
+    const { name, phone, location,email } = req.body;
+
+    if (!name && !phone && !location && !email)
+      return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS,null);
+
+    const profile = await prisma.profile.update({
+      where: { userId: Number(userId) },
+      data: { name, phone, location }
+    });
+    const user = await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { email } 
+});
+    return sendSuccess(res, Messages.PROFILE_UPDATED, profile,user);
+  } catch {
+    return sendError(res, StatusCode.SERVER_ERROR, Messages.UPDATE_FAILED, null);
+  }
 }
 
+// DELETE USER
+static async deleteUser(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
 
+    const profile = await prisma.profile.delete({
+      where: { userId: Number(userId) }
+    });
+
+    await prisma.user.delete({
+      where: { id: Number(userId) }
+    });
+
+    return sendSuccess(res, Messages.USER_DELETED, profile);
+
+  } catch {
+    return sendError(res, StatusCode.SERVER_ERROR, Messages.DELETE_FAILED, null);
+  }
+}
+
+}
 
 

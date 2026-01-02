@@ -1,10 +1,11 @@
 import { StatusCode } from "./statuscode";
 
-export const sendSuccess = (res: any, message: string,data:Record<string, any> ) => {
+export const sendSuccess =<T> (res: any, message: string, data?:T |  null, user?: any) => {
     return res.status(StatusCode.SUCCESS).json({
         success: true,
         message,
         data,
+        user,
     });
 };
 
@@ -12,5 +13,6 @@ export const sendError = (res: any, status: number, message: string, err: unknow
     return res.status(status).json({
         success: false,
         message,
+
     });
 };
