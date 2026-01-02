@@ -11,7 +11,9 @@ export const Messages = {
     
     INVALID_EMAIL: "Please enter a valid email address",
     INVALID_PASSWORD:"Password must be at least 6 characters, include letters and numbers",
-
+ 
+    PROFILE_UPDATED: "Profile updated successfully",
+    USER_DELETED: "User & Profile deleted",
    
   };
   

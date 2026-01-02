@@ -5,62 +5,90 @@ import { sendSuccess, sendError } from "../utils/response";
 import { Messages } from "../utils/messages";
 import { Queries } from "../services/auth.Service";
 import { StatusCode } from "../utils/statuscode";
+import prisma from "../config/prisma";
 
-export class Authcontrol {
+// import { Request, Response } from "express";
+// import prisma from "../config/prisma";
+// import bcrypt from "bcrypt";
+// import { sendError, sendSuccess } from "../utils/response";
+// import { StatusCode, Messages } from "../constants";
+
+export default class Authcontrol {
 
   // REGISTER
   static async register(req: Request, res: Response) {
-    const { email, password } = req.body;
+    try {
+      const { email, password, name, phone, location } = req.body;
 
-    if (!email || !password)
-      // console.log(StatusCode.BAD_REQUEST);
-      return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS);
+      if (!email || !password || !name || !phone || !location)
+        return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-    // const checkSql = "SELECT email FROM users WHERE email = ?";
+      // Check email exists
+      const exist = await prisma.user.findUnique({
+        where: { email }
+      });
 
-    db.query(Queries.CHECK_EMAIL, [email], async (err, results: any[]) => {
-      if (err) return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR);
-
-      if (results.length > 0)
-        return sendError(res, StatusCode.CONFLICT, Messages.EMAIL_EXISTS);
+      if (exist)
+        return sendError(res, StatusCode.CONFLICT, Messages.EMAIL_EXISTS, null);
 
       const hashed = await bcrypt.hash(password, 10);
 
-      // const insertSql ="INSERT INTO users (email, password) VALUES (?, ?)";
-
-      db.query(Queries.INSERT_USER, [email, hashed], (err2) => {
-        if (err2) return sendError(res, StatusCode.SERVER_ERROR, Messages.INSERT_FAILED);
-
-        return sendSuccess(res, Messages.REGISTER_SUCCESS, { email });
+      // Create user + profile
+      const user = await prisma.user.create({
+        data: {
+          email,
+          password: hashed,
+          profile: {
+            create: { name, phone, location }
+          }
+        },
+        include: { profile: true }
       });
-    });
+
+      return sendSuccess(res, Messages.REGISTER_SUCCESS, {
+        id: user.id,
+        email: user.email,
+        profile: user.profile
+      });
+
+    } catch (err) {
+      return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
+    }
   }
 
   // LOGIN
   static async login(req: Request, res: Response) {
-    const { email, password } = req.body;
+    try {
+      const { email, password } = req.body;
 
-    if (!email || !password)
-      return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS);
+      if (!email || !password)
+        return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-    // const sql = "SELECT * FROM users WHERE email = ?";
+      // Find user
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: { profile: true }
+      });
 
-    db.query(Queries.FIND_USER, [email], async (err, results: any[]) => {
-      if (err) return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR);
+      if (!user)
+        return sendError(res, StatusCode.NOT_FOUND, Messages.USER_NOT_FOUND, null);
 
-      if (!results || results.length === 0)
-        return sendError(res, StatusCode.NOT_FOUND, Messages.USER_NOT_FOUND);
-
-      const user = results[0];
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch)
-        return sendError(res, StatusCode.UNAUTHORIZED, Messages.INVALID_CREDENTIALS);
+      const match = await bcrypt.compare(password, user.password);
+      if (!match)
+        return sendError(res, StatusCode.UNAUTHORIZED, Messages.INVALID_CREDENTIALS, null);
 
       return sendSuccess(res, Messages.LOGIN_SUCCESS, {
+        id: user.id,
         email: user.email,
+        profile: user.profile
       });
-    });
+
+    } catch (err) {
+      return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
+    }
   }
 }
+
+
+
 
