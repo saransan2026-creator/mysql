@@ -1,6 +1,6 @@
 import express, { type Request, type Response, type NextFunction } from "express";
-import { Messages } from "../utils/messages";
-import { Regex } from "../utils/regex";
+import { Messages } from "../Utils/Messages";
+import { Regex } from "../Utils/Regex";
 
 export const validateAuth = (
   req:  Request,

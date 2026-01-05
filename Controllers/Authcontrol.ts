@@ -1,11 +1,9 @@
 import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
-import { sendSuccess, sendError } from "../utils/response";
-import { Messages } from "../utils/messages";
-import { StatusCode } from "../utils/statuscode";
-import prisma from "../config/prisma";
-import { profile } from "console";
-import { Queries } from "../services/auth.Service";
+import { sendSuccess, sendError } from "../Utils/Response";
+import { Messages } from "../Utils/Messages";
+import { StatusCode } from "../Utils/statuscode";
+import { authService } from "../Services/AuthService";
 
 
 export default class Authcontrol {
@@ -19,7 +17,7 @@ export default class Authcontrol {
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
       // Check email exists
-      const exist = await Queries.CHECK_EMAIL_EXISTS(email);
+      const exist = await authService.CHECK_EMAIL_EXISTS(email);
 
       if (exist)
         return sendError(res, StatusCode.CONFLICT, Messages.EMAIL_EXISTS, null);
@@ -27,7 +25,7 @@ export default class Authcontrol {
       const hashed = await bcrypt.hash(password, 10);
 
       // Create user + profile
-      const user = await Queries.INSERT_USER({
+      const user = await authService.INSERT_USER({
         email,
         password: hashed,
         name,
@@ -48,7 +46,7 @@ export default class Authcontrol {
       if (!email || !password)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-      const user = await Queries.FIND_UESER(email);
+      const user = await authService.FIND_UESER(email);
 
       if (!user)
         return sendError(res, StatusCode.NOT_FOUND, Messages.USER_NOT_FOUND, null);
@@ -72,19 +70,19 @@ export default class Authcontrol {
  // UPDATE PROFILE 
  static async updateProfile(req: Request, res: Response) {
   try {
-    const  userId  = req.query.userId as string;
+    const  userId  = Number(req.query.userId);
     const { name, phone, location,email } = req.body;
 
     if (!name && !phone && !location && !email)
       return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS,null);
 
-    const profile = await Queries.UPDATE_PROFILE(Number(userId), {
+    const profile = await authService.UPDATE_PROFILE(Number(userId), {
       email,
       name,
       phone,
       location
     });
-    const user = await Queries.UPDATE_PROFILE(Number(userId), {
+    const user = await authService.UPDATE_PROFILE(Number(userId), {
       email,
       name,
 });
@@ -97,9 +95,9 @@ export default class Authcontrol {
 // DELETE USER
 static async deleteUser(req: Request, res: Response) {
   try {
-    const { userId } = req.params;
+    const  userId  = Number(req.query.userId);
 
-    const profile = await Queries.DELETE_USER(Number(userId));
+    const profile = await authService.DELETE_USER(Number(userId));
     return sendSuccess(res, Messages.USER_DELETED, profile);
 
   } catch {

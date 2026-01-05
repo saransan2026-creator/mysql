@@ -1,19 +1,20 @@
-import prisma from "../config/prisma";
+// import prisma from "../Config/Prisma";
+import  prisma  from "../Config/prisma";
 
-export const Queries = {
-   
-  CHECK_EMAIL_EXISTS: async (email: string) => {
+export class authService {
+
+ static async  CHECK_EMAIL_EXISTS (email: string)  {
     return await prisma.user.findUnique({
       where: { email }
     });
-  },
-    INSERT_USER: async (data: {
+  }
+   static async INSERT_USER (data: {
       email: string;
       password: string;
       name: string;
       phone: string;
       location: string;
-    }) => {
+    })  {
       return await prisma.user.create({
         data: {
           email: data.email,
@@ -28,33 +29,36 @@ export const Queries = {
         },
         include: { profile: true }
       });
-    },
+    }
     
-    FIND_UESER:async(email:string)=>{
+  static async FIND_UESER (email:string){
       return await prisma.user.findUnique({
         where: { email },
         include: { profile: true }
       });
-    },
+    }
 
-    UPDATE_PROFILE: async (
+   static async UPDATE_PROFILE (
       userId: number,
       data: { name?: string; 
               phone?: string; 
               location?: string,
               email?:string 
             }
-    ) => {
+    ) {
       return await prisma.profile.update({
         where: { userId },
         data
       });
-    },
+    }
 
 
-    DELETE_USER: async (userId: number) => {
+   static async DELETE_USER(userId: number)  {
       await prisma.profile.delete({ where: { userId } });
       await prisma.user.delete({ where: { id: userId } });
       return true;
     }
   };
+
+   
+  
