@@ -1,13 +1,15 @@
 import { Router } from "express";
 import Authcontrol from "../Controllers/Authcontrol";
-import { validateAuth } from "../Middlewares/Validate";
+import { RegisterSchema,LoginSchema } from "../Utils/Schema";
+import { ZodError } from "zod";
+
 
 const router = Router();
 
-router.post("/register",validateAuth, Authcontrol.register);
-router.post("/login",validateAuth, Authcontrol.login);
-router.put("/profile/:userId", Authcontrol.updateProfile);
+router.post("/register", Authcontrol.register);
+router.post("/login", Authcontrol.login);
+// router.put("/profile/:userId", Authcontrol.updateProfile);
 router.delete("/user/:userId", Authcontrol.deleteUser);
 
 export default router;
-
+    
