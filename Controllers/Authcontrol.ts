@@ -5,6 +5,7 @@ import { Messages } from "../utils/messages";
 import { StatusCode } from "../utils/statuscode";
 import prisma from "../config/prisma";
 import { profile } from "console";
+import { Queries } from "../services/auth.Service";
 
 
 export default class Authcontrol {
@@ -18,9 +19,7 @@ export default class Authcontrol {
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
       // Check email exists
-      const exist = await prisma.user.findUnique({
-        where: { email }
-      });
+      const exist = await Queries.CHECK_EMAIL_EXISTS(email);
 
       if (exist)
         return sendError(res, StatusCode.CONFLICT, Messages.EMAIL_EXISTS, null);
@@ -28,25 +27,14 @@ export default class Authcontrol {
       const hashed = await bcrypt.hash(password, 10);
 
       // Create user + profile
-      const user = await prisma.user.create({
-        data: {
-          email,
-          password: hashed,
-          profile: {
-            create: { name, phone, location }
-          }
-        },
-        include: { profile: true }
+      const user = await Queries.INSERT_USER({
+        email,
+        password: hashed,
+        name,
+        phone,
+        location
       });
-
-      return sendSuccess(res, Messages.REGISTER_SUCCESS, {
-        // id: user.id,
-        // email: user.email,
-        // profile: user.profile
-        
-      }
-      ,user);
-
+      return sendSuccess(res, Messages.REGISTER_SUCCESS, {});
     } catch (err) {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
     }
@@ -60,10 +48,7 @@ export default class Authcontrol {
       if (!email || !password)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-      const user = await prisma.user.findUnique({
-        where: { email },
-        include: { profile: true }
-      });
+      const user = await Queries.FIND_UESER(email);
 
       if (!user)
         return sendError(res, StatusCode.NOT_FOUND, Messages.USER_NOT_FOUND, null);
@@ -77,7 +62,7 @@ export default class Authcontrol {
         email: user.email,
         profile: user.profile,
       },
-      user
+      
     );
     } catch (err) {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
@@ -93,13 +78,15 @@ export default class Authcontrol {
     if (!name && !phone && !location && !email)
       return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS,null);
 
-    const profile = await prisma.profile.update({
-      where: { userId: Number(userId) },
-      data: { name, phone, location }
+    const profile = await Queries.UPDATE_PROFILE(Number(userId), {
+      email,
+      name,
+      phone,
+      location
     });
-    const user = await prisma.user.update({
-      where: { id: Number(userId) },
-      data: { email } 
+    const user = await Queries.UPDATE_PROFILE(Number(userId), {
+      email,
+      name,
 });
     return sendSuccess(res, Messages.PROFILE_UPDATED, profile,user);
   } catch {
@@ -112,13 +99,9 @@ static async deleteUser(req: Request, res: Response) {
   try {
     const { userId } = req.params;
 
-    const profile = await prisma.profile.delete({
-      where: { userId: Number(userId) }
-    });
+    const profile = await Queries.DELETE_USER(Number(userId));
 
-    await prisma.user.delete({
-      where: { id: Number(userId) }
-    });
+    // await Queries.DELETE_USER(Number(userId));
 
     return sendSuccess(res, Messages.USER_DELETED, profile);
 

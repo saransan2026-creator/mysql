@@ -7,7 +7,7 @@ export const validateAuth = (
   res:  Response,
   next: NextFunction
 ) => {
-  const { email, password } = req.body;
+  const { email, password,phone } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
@@ -27,6 +27,10 @@ export const validateAuth = (
 
     });
   }
-
+  if (!Regex.PHONE_NUMBER.test(phone)) {
+    return res.status(400).json({
+      message: Messages.INVALID_PHONE,
+    });
+  }
   next();
 };

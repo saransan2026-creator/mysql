@@ -10,6 +10,7 @@ export const Messages = {
   LOGIN_SUCCESS: "Login successful",
 
   INVALID_EMAIL: "Please enter a valid email address",
+  INVALID_PHONE: "Please enter a valid phone number",
   INVALID_PASSWORD: "Password must be at least 6 characters, include letters and numbers",
 
   PROFILE_UPDATED: "Profile updated successfully",
