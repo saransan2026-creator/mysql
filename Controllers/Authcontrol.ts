@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { sendSuccess, sendError } from "../Utils/Response";
 import { Messages } from "../Utils/Messages";
 import { StatusCode } from "../Utils/Statuscode";
-import { authService } from "../Services/AuthService";
+import { Authservice} from "../Services/AuthService";
 
 
 export default class Authcontrol {
@@ -16,20 +16,20 @@ export default class Authcontrol {
       if (!email || !password || !name || !phone || !location)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-      const exist = await authService.CHECK_EMAIL_EXISTS(email);
+      const exist = await Authservice.checkEmailExist(email);
       if (exist)
         return sendError(res, StatusCode.CONFLICT, Messages.EMAIL_EXISTS, null);
 
       const hashed = await bcrypt.hash(password, 10);
 
-      const user = await authService.INSERT_USER({
+      const user = await Authservice.insertUser({
         email,
         password: hashed,
         name,
         phone,
         location
       });
-      return sendSuccess(res, Messages.REGISTER_SUCCESS, {});
+      return sendSuccess(res, Messages.REGISTER_SUCCESS);
     } catch (err) {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
     }
@@ -43,10 +43,10 @@ export default class Authcontrol {
       if (!email || !password)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.REQUIRED_FIELDS, null);
 
-      const user = await authService.FIND_UESER(email);
+      const user = await Authservice.findUser(email);
 
       if (!user)
-        return sendError(res, StatusCode.NOT_FOUND, Messages.USER_NOT_FOUND, null);
+        return sendError(res, StatusCode.UNAUTHORIZED, Messages.USER_NOT_FOUND, null);
 
       const match = await bcrypt.compare(password, user.password);
       if (!match)
@@ -72,13 +72,13 @@ export default class Authcontrol {
       if (!name && !phone && !location && !email)
         return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS, null);
 
-      const profile = await authService.UPDATE_PROFILE(Number(userId), {
+      const profile = await Authservice.updateProfile(Number(userId), {
         email,
         name,
         phone,
         location
       });
-      const user = await authService.UPDATE_PROFILE(Number(userId), {
+      const user = await Authservice.updateProfile(Number(userId), {
         email,
         name,
       });
@@ -93,7 +93,7 @@ export default class Authcontrol {
     try {
       const userId = Number(req.query.userId);
 
-      const profile = await authService.DELETE_USER(Number(userId));
+      const profile = await Authservice.deleteUser(Number(userId));
       return sendSuccess(res, Messages.USER_DELETED, profile);
 
     } catch {

@@ -1,13 +1,13 @@
 import  prisma  from "../Config/prisma";
 
-export class authService {
+export class Authservice {
 
- static async  CHECK_EMAIL_EXISTS (email: string)  {
+ static async  checkEmailExist (email: string)  {
     return await prisma.user.findUnique({
       where: { email }
     });
   }
-   static async INSERT_USER (data: {
+   static async insertUser (data: {
       email: string;
       password: string;
       name: string;
@@ -30,14 +30,14 @@ export class authService {
       });
     }
     
-  static async FIND_UESER (email:string){
+  static async findUser (email:string){
       return await prisma.user.findUnique({
         where: { email },
         include: { profile: true }
       });
     }
 
-   static async UPDATE_PROFILE (
+   static async updateProfile (
       userId: number,
       data: { name?: string; 
               phone?: string; 
@@ -52,7 +52,7 @@ export class authService {
     }
 
 
-   static async DELETE_USER(userId: number)  {
+   static async deleteUser(userId: number)  {
       await prisma.profile.delete({ where: { userId } });
       await prisma.user.delete({ where: { id: userId } });
       return true;
