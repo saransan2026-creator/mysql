@@ -1,4 +1,4 @@
-import { StatusCode } from './statuscode';
+import { StatusCode } from './Statuscode';
 
 export const sendSuccess =<T> (res: any, message: string, data?:T |  null, user?: any) => {
     return res.status(StatusCode.SUCCESS).json({

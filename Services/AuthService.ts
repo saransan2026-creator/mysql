@@ -1,4 +1,3 @@
-// import prisma from "../Config/Prisma";
 import  prisma  from "../Config/prisma";
 
 export class authService {
