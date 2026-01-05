@@ -100,9 +100,6 @@ static async deleteUser(req: Request, res: Response) {
     const { userId } = req.params;
 
     const profile = await Queries.DELETE_USER(Number(userId));
-
-    // await Queries.DELETE_USER(Number(userId));
-
     return sendSuccess(res, Messages.USER_DELETED, profile);
 
   } catch {
