@@ -73,31 +73,8 @@
 //     }
 //   }
 
-//   // UPDATE PROFILE 
-//   static async updateProfile(req: Request, res: Response) {
-//     try {
-//       const userId = Number(req.query.userId);
-//       const { name, phone, location, email } = req.body;
-
-//       if (!name && !phone && !location && !email)
-//         return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS, null);
-
-//       const profile = await Authservice.updateProfile(Number(userId), {
-//         email,
-//         name,
-//         phone,
-//         location
-//       });
-//       const user = await Authservice.updateProfile(Number(userId), {
-//         email,
-//         name,
-//       });
-//       return sendSuccess(res, Messages.PROFILE_UPDATED, profile, user);
-//     } catch {
-//       return sendError(res, StatusCode.SERVER_ERROR, Messages.UPDATE_FAILED, null);
-//     }
-//   }
-
+  // UPDATE PROFILE 
+  
 //   // DELETE USER
 //   static async deleteUser(req: Request, res: Response) {
 //     try {
@@ -190,46 +167,68 @@ export default class Authcontrol {
       return sendError(res, StatusCode.SERVER_ERROR, Messages.DB_ERROR, err);
     }
   }
-
-  // // UPDATE PROFILE (Query Param userId)
+  // UPDATE PROFILE
   // static async updateProfile(req: Request, res: Response) {
   //   try {
-  //     const userId = Number(req.query.userId);
+  //     const userId = Number(req.params.userId);
+  //     const { name, phone, location, email } = req.body;
 
   //     if (!userId)
-  //       return sendError(res, StatusCode.BAD_REQUEST, "userId is required", null);
+  //       return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS, null);
 
-  //     const data = UpdateSchema.parse(req.body);
-
-  //     const profile = await Authservice.updateProfile(userId, data);
-
-  //     return sendSuccess(res, Messages.PROFILE_UPDATED, profile);
-
-  //   } catch (err) {
-
-  //     if (err instanceof ZodError)
-  //       return sendError(res, StatusCode.BAD_REQUEST, err.issues[0].message, null);
-
-  //     return sendError(res, StatusCode.SERVER_ERROR, Messages.UPDATE_FAILED, err);
+  //     const profile = await Authservice.updateProfile(Number(userId), {
+  //       email,
+  //       name,
+  //       phone,
+  //       location
+  //     });
+  //     return sendSuccess(res, Messages.PROFILE_UPDATED, profile,null);
+  //   } catch {
+  //     return sendError(res, StatusCode.SERVER_ERROR, Messages.UPDATE_FAILED, null);
   //   }
   // }
-
-  // DELETE USER
-  static async deleteUser(req: Request, res: Response) {
+  static async updateProfile(req: Request, res: Response) {
     try {
-      const userId = Number(req.query.userId);
-
-      if (!userId)
+      const userId = Number(req.params.userId);
+  
+      if (!userId) {
         return sendError(res, StatusCode.BAD_REQUEST, "userId is required", null);
-
-      await Authservice.deleteUser(userId);
-
-      return sendSuccess(res, Messages.USER_DELETED, null);
-
+      }
+  
+      const { name, phone, location, email } = req.body;
+  
+      // If no fields provided
+      if (!name && !phone && !location && !email) {
+        return sendError(res, StatusCode.BAD_REQUEST, Messages.NO_UPDATE_FIELDS, null);
+      }
+  
+      const profile = await Authservice.updateProfile(userId, {
+        name,
+        phone,
+        location,
+        email
+      });
+  
+      return sendSuccess(res, Messages.PROFILE_UPDATED, profile);
+  
     } catch (err) {
-      return sendError(res, StatusCode.SERVER_ERROR, Messages.DELETE_FAILED, err);
+      console.error("UPDATE ERROR:", err);
+      return sendError(res, StatusCode.SERVER_ERROR, Messages.UPDATE_FAILED, err);
     }
   }
+
+// DELETE USER
+  static async deleteUser(req: Request, res: Response) {
+        try {
+          const userId = Number(req.query.userId);
+    
+          const profile = await Authservice.deleteUser(Number(userId));
+          return sendSuccess(res, Messages.USER_DELETED, profile);
+    
+        } catch {
+          return sendError(res, StatusCode.SERVER_ERROR, Messages.DELETE_FAILED, null);
+        }
+      }
 }
 
 

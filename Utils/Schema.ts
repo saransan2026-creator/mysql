@@ -27,14 +27,4 @@ export const LoginSchema = z.object({
         message: "Password is required"
     })
 })
-export const UpdateProfileSchema = z.object({
-    name: z.string().min(1,{
-        message: "Name is required"
-    }),
-    phone:z.string().regex(Regex.PHONE_NUMBER,{
-        message: "Invalid phone number format"
-    }),
-    location: z.string().min(1,{
-        message: "Location is required"
-    })
-})
+

@@ -1,4 +1,4 @@
-import  prisma  from "../Config/prisma";
+import  prisma  from "../Config/Prisma"
 
 export class Authservice {
 
@@ -47,7 +47,11 @@ export class Authservice {
     ) {
       return await prisma.profile.update({
         where: { userId },
-        data
+        data:{
+          name: data.name,
+          phone: data.phone,
+          location: data.location
+        }
       });
     }
 
